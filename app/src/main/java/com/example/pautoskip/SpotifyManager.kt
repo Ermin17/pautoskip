@@ -15,6 +15,8 @@ import com.spotify.protocol.client.Subscription;
 import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Track;
 
+// TODO: Automatically connect when spotify is launched
+// TODO: Create settings to only launch when spotify is playing a specific type of track
 
 class SpotifyManager(private val context: Context, private val clientId: String, private val redirectUri: String) {
 

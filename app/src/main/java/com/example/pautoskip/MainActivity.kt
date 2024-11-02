@@ -1,23 +1,44 @@
 package com.example.pautoskip
 
-import android.content.Intent
-import android.os.Bundle
-import android.util.Log
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.pautoskip.ui.theme.PAutoSkipTheme
@@ -27,7 +48,9 @@ class MainActivity : ComponentActivity() {
     private lateinit var spotifyManager: SpotifyManager
 
     // Mutable state to store connection status
-    private val connectionStatus = mutableStateOf("Not Connected");
+    private val connectionStatus = mutableStateOf("Not Connected")
+    private val isLoading = mutableStateOf(false)
+
 
     // Create an ActivityResultLauncher for requesting permissions
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
@@ -35,12 +58,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Spotify credentials and initialize the manager
-        // val clientId = BuildConfig.SPOTIFY_CLIENT_ID
-        // val redirectUri = BuildConfig.SPOTIFY_REDIRECT_URI
-
         val clientId = "<your client id>"
-        val redirectUri = "<your redirect uri"
+        val redirectUri = "<your redirect uri>"
 
         // Initialize ActivityResultLauncher for permissions
         requestPermissionLauncher = registerForActivityResult(
@@ -53,6 +72,8 @@ class MainActivity : ComponentActivity() {
             } else {
                 Log.e("MainActivity", "Foreground Service permission denied")
             }
+
+
         }
 
         // Initialize SpotifyManager
@@ -87,8 +108,10 @@ class MainActivity : ComponentActivity() {
                         startForegroundService()
                     }
                 }
+                isLoading.value = false
             }
         }
+
 
 
         setContent {
@@ -103,26 +126,72 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Spacer(modifier = Modifier.height(16.dp)) // Space above the welcome text
 
-                        WelcomeScreen("Welcome to PAutoSkip")
+                        WelcomeScreen("PAutoSkip")
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        SpotifyInstalled(checkSpotifyInstallation())
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+
+                        CurrentStatus(connectionStatus.value)
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // Instruction text with (i) icon
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(horizontal = 16.dp) // Add padding for better layout
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Info, // Use a suitable info icon
+                                contentDescription = "Info",
+                                tint = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                            Text(
+                                text = "Please make sure Spotify is installed and you are logged in before pressing connect",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                textAlign = TextAlign.Center
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp)) // Reduced space below the welcome text
 
                         // Center section
-                        Spacer(modifier = Modifier.weight(1f)) // Push the status and button down
-
-                        CurrentStatus(connectionStatus.value)
+                        Spacer(modifier = Modifier.weight(.5f)) // Push the status and button down
 
                         Spacer(modifier = Modifier.height(32.dp)) // Reduced space between status and button
 
                         ConnectButton(onClick = {
-                            spotifyManager.connect()
-                            Log.d("MainActivity", "Button Clicked")
-                        })
+                            if (!isLoading.value) {
+                                isLoading.value = true
+                                spotifyManager.connect()
+                                Log.d("MainActivity", "Button Clicked")
+                            }
+                        }, checkSpotifyInstallation(), isLoading.value)
+
 
                         Spacer(modifier = Modifier.weight(1f)) // Optional spacer to keep things centered
                     }
                 }
             }
+        }
+    }
+
+    fun checkSpotifyInstallation(): Boolean {
+        val pm = packageManager
+        return try {
+            pm.getPackageInfo("com.spotify.music", 0)
+            // Installed
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            // Not installed
+            false
         }
     }
 
@@ -169,55 +238,77 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+fun SpotifyInstalled(isInstalled: Boolean, modifier: Modifier = Modifier) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        val icon = if (isInstalled) Icons.Default.CheckCircle else Icons.Default.Close
+        val iconColor = if (isInstalled) Color.Green else Color.Red
+        val message = if (isInstalled) "Spotify is installed" else "Spotify is not installed"
+
+        Icon(
+            imageVector = icon,
+            contentDescription = if (isInstalled) "Checkmark" else "Red X",
+            tint = iconColor,
+            modifier = Modifier.size(32.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = message, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
 fun WelcomeScreen(text: String, modifier: Modifier = Modifier) {
     Text(
-        text = text,
-        style = MaterialTheme.typography.titleLarge,
-        modifier = modifier
+        text = "PAutoSkip",
+        style = MaterialTheme.typography.displayLarge,
+        color = MaterialTheme.colorScheme.primary
     )
 }
 
 @Composable
 fun CurrentStatus(text: String, modifier: Modifier = Modifier) {
+    val (statusText, statusColor) = when (text) {
+        "Connected" -> "Connected" to Color.Green
+        "Not Connected" -> "Not Connected" to Color.Red
+        else -> text to Color.Red
+    }
+
+    // Create an annotated string for different colors
+    val annotatedString = buildAnnotatedString {
+        append("Current Status: ")
+        withStyle(style = SpanStyle(color = statusColor)) {
+            append(statusText) // Apply color only to the status text
+        }
+    }
+
     Text(
-        text = text,
+        text = annotatedString,
         style = MaterialTheme.typography.titleLarge,
         modifier = modifier
     )
 }
 
 @Composable
-fun ConnectButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun ConnectButton(onClick: () -> Unit, isInstalled: Boolean, isLoading: Boolean, modifier: Modifier = Modifier) {
     Button(
+        enabled = isInstalled || !isLoading,
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Green,
             contentColor = Color.Black
         ),
         modifier = modifier
+            .width(200.dp)
+            .height(50.dp)
     ) {
-        Text(text = "Connect")
-    }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun WelcomeScreenPreview() {
-    PAutoSkipTheme {
-        // Preview of the layout
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top, // Align items towards the top
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(16.dp)) // Space for preview
-            WelcomeScreen("Welcome to PAutoSkip")
-            Spacer(modifier = Modifier.height(16.dp)) // Space below the welcome text
-            CurrentStatus("Not Connected")
-            Spacer(modifier = Modifier.height(8.dp)) // Space between status and button
-            //ConnectButton()
+        if (isLoading) {
+            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(8.dp))
         }
+        Text(
+            text = if (isLoading) "Connecting..." else "Connect")
     }
 }
