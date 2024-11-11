@@ -58,8 +58,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val clientId = "<your client id>"
-        val redirectUri = "<your redirect uri>"
+        val clientId = "<client id>"
+        val redirectUri = "<redirect uri>"
 
         // Initialize ActivityResultLauncher for permissions
         requestPermissionLauncher = registerForActivityResult(
@@ -130,8 +130,6 @@ class MainActivity : ComponentActivity() {
 
                         Spacer(modifier = Modifier.weight(1f))
 
-                        SpotifyInstalled(checkSpotifyInstallation())
-
                         Spacer(modifier = Modifier.height(24.dp))
 
 
@@ -160,7 +158,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp)) // Reduced space below the welcome text
+                        Spacer(modifier = Modifier.height(32.dp)) // Reduced space below the welcome text
+
+                        SpotifyInstalled(checkSpotifyInstallation())
 
                         // Center section
                         Spacer(modifier = Modifier.weight(.5f)) // Push the status and button down
@@ -264,7 +264,7 @@ fun WelcomeScreen(text: String, modifier: Modifier = Modifier) {
     Text(
         text = "PAutoSkip",
         style = MaterialTheme.typography.displayLarge,
-        color = MaterialTheme.colorScheme.primary
+        color = Color.Green
     )
 }
 
