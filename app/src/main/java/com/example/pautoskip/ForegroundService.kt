@@ -32,8 +32,6 @@ class ForegroundService: Service() {
         val notification = createNotification() // Create notification
         startForeground(1, notification) // Start the service in the foreground
 
-        // Logic to connect to Spotify or listen for changes
-
         return START_STICKY
     }
 

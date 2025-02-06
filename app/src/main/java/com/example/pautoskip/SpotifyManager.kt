@@ -35,7 +35,7 @@ class SpotifyManager(private val context: Context, private val clientId: String,
             override fun onConnected(appRemote: SpotifyAppRemote) {
                 spotifyAppRemote = appRemote
                 onConnectionStatusChanged?.invoke("Connected")
-                Log.d("SpotifyManager", "Connected! Yay!")
+
                 connected()
 
                 val serviceIntent = Intent(context, ForegroundService::class.java)
@@ -52,7 +52,7 @@ class SpotifyManager(private val context: Context, private val clientId: String,
     private fun connected() {
         // Listen for track changes to advertisement then skip to end
         spotifyAppRemote?.playerApi?.subscribeToPlayerState()?.setEventCallback { playerState ->
-            // Log or use the playerContext data
+            // playerContext data
             val trackUri = playerState.track?.uri
             val durationValue = playerState.track?.duration
             val isAd = trackUri?.contains("spotify:ad:") == true
@@ -63,7 +63,6 @@ class SpotifyManager(private val context: Context, private val clientId: String,
                 spotifyAppRemote?.playerApi?.seekTo(durationValue)
             }
 
-            // Log.d("PlayerState", playerState.toString());
 
         }?.setErrorCallback { throwable ->
             Log.e("PLayerState", "Error in subscribing to player state", throwable)

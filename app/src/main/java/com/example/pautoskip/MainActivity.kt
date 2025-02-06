@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // If building your own apk from this repo, you will need to add your own client Id and redirect uri
         val clientId = "<client id>"
         val redirectUri = "<redirect uri>"
 
@@ -88,23 +89,18 @@ class MainActivity : ComponentActivity() {
                             // Check notification permission for API level 33 and above
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                                 ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                                Log.e("MainActivity", "All permissions granted; starting foreground service.")
                                 startForegroundService()
                             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 // Request notification permission if not granted
-                                Log.e("MainActivity", "Requesting notification permission.")
                                 requestPermissionLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
                             } else {
-                                Log.e("MainActivity", "Starting foreground service on older Android version.")
                                 startForegroundService()
                             }
                         } else {
                             // Request foreground service permission if not granted
-                            Log.e("MainActivity", "Requesting foreground service permission.")
                             requestPermissionLauncher.launch(arrayOf(Manifest.permission.FOREGROUND_SERVICE))
                         }
                     } else {
-                        Log.e("MainActivity", "Starting foreground service on older Android version.")
                         startForegroundService()
                     }
                 }
@@ -116,15 +112,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PAutoSkipTheme {
-                // A surface container using the 'background' color from the theme
+
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    // Arrange items in a vertical column
+
                     Column(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Top, // Align items towards the top
+                        verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(16.dp)) // Space above the welcome text
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         WelcomeScreen("PAutoSkip")
 
@@ -141,15 +137,15 @@ class MainActivity : ComponentActivity() {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(horizontal = 16.dp) // Add padding for better layout
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.Info, // Use a suitable info icon
+                                imageVector = Icons.Filled.Info,
                                 contentDescription = "Info",
                                 tint = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.size(32.dp)
                             )
-                            Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Please make sure Spotify is installed and you are logged in before pressing connect",
                                 style = MaterialTheme.typography.bodyLarge,
@@ -163,9 +159,9 @@ class MainActivity : ComponentActivity() {
                         SpotifyInstalled(checkSpotifyInstallation())
 
                         // Center section
-                        Spacer(modifier = Modifier.weight(.5f)) // Push the status and button down
+                        Spacer(modifier = Modifier.weight(.5f))
 
-                        Spacer(modifier = Modifier.height(32.dp)) // Reduced space between status and button
+                        Spacer(modifier = Modifier.height(32.dp))
 
                         ConnectButton(onClick = {
                             if (!isLoading.value) {
@@ -176,7 +172,7 @@ class MainActivity : ComponentActivity() {
                         }, checkSpotifyInstallation(), isLoading.value)
 
 
-                        Spacer(modifier = Modifier.weight(1f)) // Optional spacer to keep things centered
+                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
@@ -221,13 +217,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        // Any other logic you want to add on start
-        Log.d("MainActivity", "onStart called")
+
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d("MainActivity", "onStop called")
     }
 
     override fun onDestroy() {
