@@ -44,7 +44,7 @@ class ForegroundService: Service() {
             .setContentTitle("PAutoSkip is Running")
             .setContentText("Listening to Spotify...")
             .setSubText("To stop, please close PAutoSkip")
-            .setSmallIcon(R.mipmap.ic_launcher)  // Use your app's icon here
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setOngoing(true)
             .build()
     }
