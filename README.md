@@ -32,7 +32,7 @@ PAutoSkip listens for Spotify playback events and detects when an ad starts play
 
 ## Disclaimer
 
-PAutoSkip is not affiliated with or endorsed by Spotify.
+PAutoSkip is not affiliated with or endorsed by Spotify. PAutoSkip does not modify or provide any new features beyond those available within the Spotify app itself.
 
 ## Contributing
 
