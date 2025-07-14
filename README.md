@@ -15,7 +15,7 @@ PAutoSkip is an Android app that automatically skips ads during Spotify podcasts
 1. Download the latest APK from the [releases](https://github.com/Ermin17/pautoskip/releases) page.
 2. Install the APK on your Android device.
 3. Grant the necessary permissions when prompted.
-4. Open Spotify and enjoying not listening to ads.
+4. Open Spotify and enjoy not listening to ads.
 
 ## Requirements
 
