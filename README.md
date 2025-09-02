@@ -1,3 +1,4 @@
+# NOTE: As of the most recent Spotify version, this no longer works due to the advertisement changes. Working on a fix.
 # PAutoSkip (Podcast Auto Skip)
 
 PAutoSkip is an Android app that automatically skips ads during Spotify podcasts. It detects when an ad is playing and seamlessly fast-forwards to resume your podcast without interruptions.
